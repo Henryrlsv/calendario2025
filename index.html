@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendario 2025</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f3f8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+      color: #1f2937;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin: 0 auto;
+      max-width: 1400px;
+    }
+
+    .month {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      padding: 15px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .month:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+    }
+
+    .month h2 {
+      text-align: center;
+      margin: 10px 0 20px 0;
+      font-size: 22px;
+      color: #3b82f6;
+    }
+
+    .weekdays, .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+    }
+
+    .weekdays div {
+      font-weight: 600;
+      color: #6b7280;
+      padding: 8px 0;
+    }
+
+    .days div {
+      padding: 14px 0;
+      margin: 3px;
+      border-radius: 10px;
+      transition: all 0.2s;
+      cursor: pointer;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .days div:hover {
+      background: #e0f2fe;
+      transform: scale(1.05);
+    }
+
+    .today {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      color: white !important;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    }
+
+    .empty {
+      background: transparent;
+      cursor: default;
+    }
+
+    /* Modal tareas */
+    #eventModal {
+      display: none;
+      position: fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(0,0,0,0.4);
+      justify-content:center;
+      align-items:center;
+      z-index: 100;
+    }
+
+    #eventModalContent {
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 16px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+      animation: modalFade 0.3s ease-out;
+    }
+
+    @keyframes modalFade {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    #eventInput {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+      box-sizing: border-box;
+      transition: all 0.2s;
+    }
+
+    #eventInput:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 6px rgba(59,130,246,0.3);
+    }
+
+    button {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    #saveEvent {
+      background: #3b82f6;
+      color: white;
+    }
+
+    #saveEvent:hover {
+      background: #2563eb;
+      transform: scale(1.05);
+    }
+
+    #closeModal {
+      background: #e5e7eb;
+      margin-left: 8px;
+    }
+
+    #closeModal:hover {
+      background: #d1d5db;
+      transform: scale(1.05);
+    }
+
+    #eventList {
+      list-style: none;
+      padding-left: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+
+    #eventList li {
+      background: #f3f4f6;
+      margin-bottom: 8px;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 15px;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    #eventList li.done {
+      text-decoration: line-through;
+      color: #9ca3af;
+      background: #e5e7eb;
+    }
+
+    #eventList li:hover {
+      background: #e0f2fe;
+    }
+
+    /* Panel lateral tareas pendientes */
+    #taskPanel {
+      position: fixed;
+      right: -320px;
+      top: 0;
+      width: 300px;
+      height: 100%;
+      background: #ffffff;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+      border-radius: 16px 0 0 16px;
+      padding: 20px;
+      transition: right 0.3s ease;
+      z-index: 200;
+      overflow-y: auto;
+    }
+
+    #taskPanel.open {
+      right: 0;
+    }
+
+    #taskPanel h3 {
+      margin-top: 0;
+      color: #3b82f6;
+    }
+
+    #taskPanel ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    #taskPanel li {
+      background: #f3f4f6;
+      margin-bottom: 8px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #taskPanel li button {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    #taskPanel li button:hover {
+      background: #2563eb;
+      transform: scale(1.05);
+    }
+
+    #togglePanel {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #3b82f6;
+      color: white;
+      border-radius: 12px 0 0 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      z-index: 210;
+      transition: background 0.2s;
+    }
+
+    #togglePanel:hover {
+      background: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <h1>📅 Calendario 2025</h1>
+  <div class="calendar" id="calendar"></div>
+
+  <!-- Modal de tareas -->
+  <div id="eventModal">
+    <div id="eventModalContent">
+      <h3 id="modalDate"></h3>
+      <input type="text" id="eventInput" placeholder="Nueva tarea">
+      <div style="margin-bottom: 12px;">
+        <button id="saveEvent">Guardar</button>
+        <button id="closeModal">Cerrar</button>
+      </div>
+      <h4>Tareas:</h4>
+      <ul id="eventList"></ul>
+    </div>
+  </div>
+
+  <!-- Panel lateral tareas pendientes -->
+  <div id="taskPanel">
+    <h3>Tareas Pendientes</h3>
+    <ul id="pendingTasks"></ul>
+  </div>
+  <div id="togglePanel">📝</div> 
+
+  <script>
+    const monthNames = [
+      "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+      "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+    ];
+    const weekdays = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+
+    function generateCalendar(year) {
+      const calendar = document.getElementById("calendar");
+      calendar.innerHTML = "";
+
+      for (let month = 0; month < 12; month++) {
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const monthDiv = document.createElement("div");
+        monthDiv.classList.add("month");
+
+        const title = document.createElement("h2");
+        title.textContent = monthNames[month];
+        monthDiv.appendChild(title);
+
+        const weekdaysRow = document.createElement("div");
+        weekdaysRow.classList.add("weekdays");
+        weekdays.forEach(d => {
+          const wd = document.createElement("div");
+          wd.textContent = d;
+          weekdaysRow.appendChild(wd);
+        });
+        monthDiv.appendChild(weekdaysRow);
+
+        const daysDiv = document.createElement("div");
+        daysDiv.classList.add("days");
+
+        let startDay = (firstDay.getDay() + 6) % 7;
+        for (let i = 0; i < startDay; i++) {
+          const empty = document.createElement("div");
+          empty.classList.add("empty");
+          daysDiv.appendChild(empty);
+        }
+
+        for (let d = 1; d <= lastDay.getDate(); d++) {
+          const day = document.createElement("div");
+          day.textContent = d;
+
+          const today = new Date();
+          if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            day.classList.add("today");
+          }
+
+          daysDiv.appendChild(day);
+        }
+
+        monthDiv.appendChild(daysDiv);
+        calendar.appendChild(monthDiv);
+      }
+    }
+
+    generateCalendar(2025);
+
+    // ------------------ Manejo de eventos ------------------
+    let events = {};
+    const modal = document.getElementById("eventModal");
+    const modalDate = document.getElementById("modalDate");
+    const eventInput = document.getElementById("eventInput");
+    const eventList = document.getElementById("eventList");
+    let selectedDate = "";
+
+    const taskPanel = document.getElementById("taskPanel");
+    const pendingTasks = document.getElementById("pendingTasks");
+    const togglePanel = document.getElementById("togglePanel");
+
+    togglePanel.addEventListener("click", () => {
+      taskPanel.classList.toggle("open");
+    });
+
+    document.addEventListener("click", function(e){
+      if(e.target.parentElement?.classList.contains("days") && !e.target.classList.contains("empty")){
+        const day = e.target.textContent.padStart(2, "0");
+        const month = (monthNames.indexOf(e.target.parentElement.parentElement.querySelector("h2").textContent)+1).toString().padStart(2,"0");
+        selectedDate = `2025-${month}-${day}`;
+        modalDate.textContent = `Tareas para ${selectedDate}`;
+        eventInput.value = "";
+        renderEvents();
+        modal.style.display = "flex";
+      }
+    });
+
+    document.getElementById("closeModal").addEventListener("click", () => modal.style.display = "none");
+
+    document.getElementById("saveEvent").addEventListener("click", () => {
+      const text = eventInput.value.trim();
+      if(!text) return;
+      if(!events[selectedDate]) events[selectedDate] = [];
+      events[selectedDate].push({ text, done: false });
+      renderEvents();
+      renderPendingTasks();
+      eventInput.value = "";
+    });
+
+    function renderEvents(){
+      eventList.innerHTML = "";
+      if(events[selectedDate]){
+        events[selectedDate].forEach((ev, i) => {
+          const li = document.createElement("li");
+          li.textContent = ev.text;
+          if(ev.done) li.classList.add("done");
+          li.addEventListener("click", () => {
+            events[selectedDate][i].done = !events[selectedDate][i].done;
+            renderEvents();
+            renderPendingTasks();
+          });
+          eventList.appendChild(li);
+        });
+      }
+    }
+
+    function renderPendingTasks() {
+      pendingTasks.innerHTML = "";
+      Object.keys(events).forEach(date => {
+        events[date].forEach((ev, i) => {
+          if(!ev.done){
+            const li = document.createElement("li");
+            const span = document.createElement("span");
+            span.textContent = `${date}: ${ev.text}`;
+            li.appendChild(span);
+
+            const doneBtn = document.createElement("button");
+            doneBtn.textContent = "✔";
+            doneBtn.addEventListener("click", () => {
+              ev.done = true;
+              renderPendingTasks();
+              if(selectedDate === date) renderEvents();
+            });
+            li.appendChild(doneBtn);
+
+            pendingTasks.appendChild(li);
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>
