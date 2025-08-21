@@ -13,6 +13,16 @@
       padding: 20px;
       color: #333;
       overflow-x: hidden;
+      transition: all 0.3s;
+    }
+
+    body.dark {
+      background: #1f2937;
+      color: #f3f4f6;
+    }
+
+    body.dark h1 {
+      color: #f3f4f6;
     }
 
     h1 {
@@ -35,7 +45,12 @@
       border-radius: 16px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.08);
       padding: 15px;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    }
+
+    body.dark .month {
+      background: #374151;
+      color: #f3f4f6;
     }
 
     .month:hover {
@@ -50,6 +65,10 @@
       color: #3b82f6;
     }
 
+    body.dark .month h2 {
+      color: #60a5fa;
+    }
+
     .weekdays, .days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -62,6 +81,10 @@
       padding: 8px 0;
     }
 
+    body.dark .weekdays div {
+      color: #d1d5db;
+    }
+
     .days div {
       padding: 14px 0;
       margin: 3px;
@@ -72,9 +95,17 @@
       color: #374151;
     }
 
+    body.dark .days div {
+      color: #f3f4f6;
+    }
+
     .days div:hover {
       background: #e0f2fe;
       transform: scale(1.05);
+    }
+
+    body.dark .days div:hover {
+      background: #2563eb;
     }
 
     .today {
@@ -109,6 +140,12 @@
       width: 90%;
       box-shadow: 0 12px 32px rgba(0,0,0,0.12);
       animation: modalFade 0.3s ease-out;
+      color: #111827;
+    }
+
+    body.dark #eventModalContent {
+      background: #374151;
+      color: #f3f4f6;
     }
 
     @keyframes modalFade {
@@ -183,14 +220,28 @@
       cursor: pointer;
     }
 
+    body.dark #eventList li {
+      background: #4b5563;
+    }
+
     #eventList li.done {
       text-decoration: line-through;
       color: #9ca3af;
       background: #e5e7eb;
     }
 
+    body.dark #eventList li.done {
+      background: #6b7280;
+      color: #d1d5db;
+    }
+
     #eventList li:hover {
       background: #e0f2fe;
+    }
+
+    body.dark #eventList li:hover {
+      background: #2563eb;
+      color: white;
     }
 
     /* Panel lateral tareas pendientes */
@@ -204,9 +255,14 @@
       box-shadow: -4px 0 20px rgba(0,0,0,0.1);
       border-radius: 16px 0 0 16px;
       padding: 20px;
-      transition: right 0.3s ease;
+      transition: right 0.3s ease, background 0.3s;
       z-index: 200;
       overflow-y: auto;
+    }
+
+    body.dark #taskPanel {
+      background: #374151;
+      color: #f3f4f6;
     }
 
     #taskPanel.open {
@@ -216,6 +272,10 @@
     #taskPanel h3 {
       margin-top: 0;
       color: #3b82f6;
+    }
+
+    body.dark #taskPanel h3 {
+      color: #60a5fa;
     }
 
     #taskPanel ul {
@@ -232,6 +292,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    body.dark #taskPanel li {
+      background: #4b5563;
+      color: #f3f4f6;
     }
 
     #taskPanel li button {
@@ -267,9 +332,28 @@
     #togglePanel:hover {
       background: #2563eb;
     }
+
+    #darkModeToggle {
+      position: fixed;
+      left: 20px;
+      top: 20px;
+      background: #3b82f6;
+      color: white;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      z-index: 210;
+    }
+
+    #darkModeToggle:hover {
+      background: #2563eb;
+    }
+
   </style>
 </head>
 <body>
+  <div id="darkModeToggle">🌙 Modo Oscuro</div>
   <h1>📅 Calendario 2025</h1>
   <div class="calendar" id="calendar"></div>
 
@@ -434,6 +518,15 @@
         });
       });
     }
+
+    // ------------------ Modo oscuro ------------------
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    darkModeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      darkModeToggle.textContent = document.body.classList.contains("dark") ? "☀ Modo Claro" : "🌙 Modo Oscuro";
+    });
+
   </script>
 </body>
 </html>
+
